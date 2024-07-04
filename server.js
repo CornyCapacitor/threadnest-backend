@@ -1,3 +1,4 @@
+const mongoose = require('mongoose')
 const express = require('express')
 require('dotenv').config()
 
@@ -13,7 +14,10 @@ app.get('/', (request, response) => {
   response.send({ message: 'Welcome to ThreadNest backend!' })
 })
 
-// listener
-app.listen(PORT, () => {
-  console.log(`Server is working on ${PORT}`)
+// connect to db
+mongoose.connect(process.env.MONGO_URI).then(() => {
+  // listen for requests
+  app.listen(PORT, () => {
+    console.log(`Connected to database & listening on port: ${PORT}`)
+  })
 })
