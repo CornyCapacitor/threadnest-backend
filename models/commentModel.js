@@ -18,10 +18,6 @@ const commentSchema = new Schema({
       ref: 'User'
     }
   ],
-  upvotesCount: {
-    type: Number,
-    default: 0
-  },
   post_id: {
     type: Schema.Types.ObjectId,
     ref: 'Post',
