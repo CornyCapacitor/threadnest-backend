@@ -22,20 +22,12 @@ const postSchema = new Schema({
       ref: 'User'
     }
   ],
-  upvotesCount: {
-    type: Number,
-    default: 0
-  },
   comments: [
     {
       type: Schema.Types.ObjectId,
       ref: 'Comment'
     }
   ],
-  commentsCount: {
-    type: Number,
-    default: 0
-  }
 }, { timestamps: true })
 
 module.exports = mongoose.model('Post', postSchema)

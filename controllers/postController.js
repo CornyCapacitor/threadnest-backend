@@ -1,8 +1,10 @@
 const mongoose = require('mongoose')
 const Post = require('../models/postModel')
 const Comment = require('../models/commentModel')
+const User = require('../models/userModel')
 
 // GET recent posts
+// Example: /api/posts/
 const getRecentPosts = async (req, res) => {
   // Fetching user ID from the request (Must be an ObjectId due to using Array.includes later on)
   const { userId } = req.user_id
@@ -27,8 +29,8 @@ const getRecentPosts = async (req, res) => {
         author_id: post.author_id,
         title: post.title,
         content: post.content,
-        upvotesCount: post.upvotesCount,
-        commentsCount: post.commentsCount,
+        upvotesCount: post.upvotes.length,
+        commentsCount: post.comments.length,
         upvoted: isUpvoted
       }
     })
@@ -43,6 +45,7 @@ const getRecentPosts = async (req, res) => {
 }
 
 // GET a single post
+// Example: /api/posts/507f191e810c19729de860ea
 const getSinglePost = async (req, res) => {
   const { id } = req.params;
   // Fetching user ID from the request (Must be an ObjectId due to using Array.includes later on)
@@ -51,7 +54,7 @@ const getSinglePost = async (req, res) => {
   try {
     // Checking if ID of a post is valid
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: 'Invalid post ID' })
+      return res.status(400).send({ message: 'Invalid post ID' })
     }
 
     // Fetching and expanding the post by author information
@@ -72,8 +75,8 @@ const getSinglePost = async (req, res) => {
       author_id: post.author_id,
       title: post.title,
       content: post.content,
-      upvotesCount: post.upvotesCount,
-      commentsCount: post.commentsCount,
+      upvotesCount: post.upvotes.length,
+      commentsCount: post.comments.length,
       upvoted: isUpvoted
     }
 
@@ -87,6 +90,7 @@ const getSinglePost = async (req, res) => {
 }
 
 // POST a new post
+// Example: /api/posts/
 const createPost = async (req, res) => {
   const { author_id, title, content } = req.body
   try {
@@ -122,13 +126,14 @@ const createPost = async (req, res) => {
 }
 
 // DELETE a post
+// Example: /api/posts/507f191e810c19729de860ea
 const deletePost = async (req, res) => {
   const { id } = req.params;
 
   try {
     // Check if ID of a post is valid
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: 'Invalid post ID' })
+      return res.status(400).send({ message: 'Invalid post ID' })
     }
 
     const post = await Post.findById(id)
@@ -150,7 +155,10 @@ const deletePost = async (req, res) => {
   }
 }
 
+// Nie podoba mi się w chuj ten update, muszę do tego usiąść jeszcze raz konkretniej
+
 // UPDATE a post
+// Example: /api/posts/507f191e810c19729de860ea
 const updatePost = async (req, res) => {
   const { id } = req.params
   const { action } = req.query
@@ -170,7 +178,7 @@ const updatePost = async (req, res) => {
       return res.status(404).send({ message: 'Post not found' })
     }
 
-    const user = await User.findById(user_id)
+    const user = await User.findById(userId)
 
     // Check if there's a user with given ID
     if (!user) {
@@ -197,14 +205,13 @@ const updatePost = async (req, res) => {
         const newComment = new Comment({
           author_id: user._id, // or userId from request
           content: content,
-          post_id: post.id // or id from request
+          post_id: post._id // or id from request
         })
 
         // Creating new comment document
         await newComment.save()
 
         // Updating the post's information
-        post.comments.push(newComment._id)
         post.commentsCount = post.comments.length
         break
 
@@ -228,8 +235,10 @@ const updatePost = async (req, res) => {
     // Update the post
     const updatedPost = await post.save()
 
+    // Sending back the response
     return res.status(200).send(updatedPost)
   } catch (error) {
+    // Sending back the error
     return res.status(500).send({ message: 'Failed to update post' })
   }
 }
