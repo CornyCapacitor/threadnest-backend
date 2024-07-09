@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
-mongoose.set('StrictQuery', true)
+const validator = require('validator')
+const bcrypt = require('bcrypt')
+mongoose.set('strictQuery', true)
 
 const Schema = mongoose.Schema
 
@@ -29,7 +31,7 @@ const userSchema = new Schema({
 // Static signup method
 userSchema.statics.signup = async function (email, password, username) {
   // Validation
-  if (!email || !password) {
+  if (!email || !password || !username) {
     throw Error('All fields are required')
   }
 

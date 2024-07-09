@@ -2,21 +2,23 @@ require('dotenv').config()
 const mongoose = require('mongoose')
 const express = require('express')
 const postRoutes = require('./routes/posts')
+const userRoutes = require('./routes/user')
 
-// app setup
+// App setup
 const app = express()
 const PORT = process.env.PORT
 
-// middlewares
+// Middlewares
 app.use(express.json())
 
-// routes
+// Routes
 app.get('/', (request, response) => {
   response.send({ message: 'Welcome to ThreadNest backend!' })
 })
 app.use('/api/posts', postRoutes)
+app.use('/api/users', userRoutes)
 
-// connect to db
+// Connect to db
 mongoose.connect(process.env.MONGO_URI).then(() => {
   // listen for requests
   app.listen(PORT, () => {
