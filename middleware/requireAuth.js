@@ -11,12 +11,8 @@ const requireAuth = async (req, res, next) => {
     return res.status(401).send({ error: 'Authorization token required' })
   }
 
-  console.log('Authorization:', authorization)
-
   // Extracting token from the headers
   const token = authorization.split(' ')[1]
-
-  console.log('Token:', token)
 
   try {
     // Verifying the token
@@ -29,12 +25,10 @@ const requireAuth = async (req, res, next) => {
     next()
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
-      console.log('Token expired:', error)
-      return res.status(401).send({ error: 'Token expired' })
+      return res.status(401).send({ error: `Token expired: ${error}` })
     }
 
     // General authorization error
-    console.log('Wrong authorization key')
     res.status(401).send({ error: 'Request is not authorized' })
   }
 }

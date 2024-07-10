@@ -1,5 +1,5 @@
 const express = require('express')
-const { getUsers, getUser, deleteUser, signupUser, loginUser } = require('../controllers/userController')
+const { getUsers, getUser, deleteUser, signupUser, loginUser, updateUser } = require('../controllers/userController')
 const requireAuth = require('../middleware/requireAuth')
 
 const router = express.Router()
@@ -18,5 +18,8 @@ router.post('/login', loginUser)
 
 // Signup route
 router.post('/signup', signupUser)
+
+// Update user route (authorization required)
+router.patch('/:id', requireAuth, updateUser)
 
 module.exports = router

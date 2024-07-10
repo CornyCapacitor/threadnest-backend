@@ -27,12 +27,17 @@ const getUsers = async (req, res) => {
   }
 }
 
-// Get user
+// GET user
 // Example: /api/users/668da2a8e36c3baeff482a9f
 const getUser = async (req, res) => {
   const { id } = req.params
 
   try {
+    // Checking if ID of a user is valid
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send({ message: 'Invalid user ID' })
+    }
+
     const user = await User.findOne({ _id: id })
 
     // Not sure if I should do this check due to try/catch block being here already
@@ -54,9 +59,9 @@ const deleteUser = async (req, res) => {
   const { id } = req.params
 
   try {
-    // Checking if ID of a post is valid
+    // Checking if ID of a user is valid
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).send({ message: 'Invalid post ID' })
+      return res.status(400).send({ message: 'Invalid user ID' })
     }
 
     const deleteUser = await User.findOneAndDelete({ _id: id })
@@ -114,10 +119,49 @@ const loginUser = async (req, res) => {
   }
 }
 
+// PATCH existing user
+// Example: /api/users/668d9b89f9494d0b032ad7b3
+const updateUser = async (req, res) => {
+  const { id } = req.params
+  const { username } = req.body
+  const userId = req.user._id
+
+  try {
+    // Checking if ID of a user is valid
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send({ message: 'Invalid user ID' })
+    }
+
+    // Checking if authorized user and params user are equal (!= is intentional)
+    if (id != userId) {
+      return res.status(404).send({ message: 'Logged user does not match user in params' })
+    }
+
+    // Updating the user in database
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId },
+      { $set: { username: username } },
+      { new: true }
+    )
+
+    // Checking if update was succesfull
+    if (!updatedUser) {
+      return res.status(404).send({ message: 'User not found' })
+    }
+
+    // Sending back the response
+    res.status(200).send({ message: `Updated user: ${updatedUser}` })
+  } catch (error) {
+    // Sending back the error
+    res.status(400).json({ error: error.message })
+  }
+}
+
 module.exports = {
   getUsers,
   getUser,
   deleteUser,
   loginUser,
-  signupUser
+  signupUser,
+  updateUser
 }
