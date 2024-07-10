@@ -67,7 +67,7 @@ const deleteUser = async (req, res) => {
     }
 
     // Sending back the response
-    res.status(200).send(deleteUser, 'User deleted succesfully')
+    res.status(200).send(deleteUser)
   } catch (error) {
     // Sending back the error
     res.status(400).json({ error: error.message })
