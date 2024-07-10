@@ -5,7 +5,7 @@ require('dotenv').config()
 
 // Token creation
 const createToken = (_id) => {
-  return jwt.sign({ _id }, process.env.JWT_SECRET, { expiresIn: '1h' })
+  return jwt.sign({ _id }, process.env.JWT_SECRET, { expiresIn: '15m' })
 }
 
 // GET all users

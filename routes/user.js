@@ -1,5 +1,6 @@
 const express = require('express')
 const { getUsers, getUser, deleteUser, signupUser, loginUser } = require('../controllers/userController')
+const requireAuth = require('../middleware/requireAuth')
 
 const router = express.Router()
 
@@ -9,8 +10,8 @@ router.get('/', getUsers)
 // Get user route
 router.get('/:id', getUser)
 
-// Delete user route
-router.delete('/:id', deleteUser)
+// Delete user route (authorization required)
+router.delete('/:id', requireAuth, deleteUser)
 
 // Login route
 router.post('/login', loginUser)

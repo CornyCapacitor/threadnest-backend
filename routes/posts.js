@@ -1,4 +1,5 @@
 const express = require('express')
+const requireAuth = require('../middleware/requireAuth')
 
 const router = express.Router()
 
@@ -12,18 +13,18 @@ router.get('/:id', (req, res) => {
   res.status(200).send({ message: 'Getting a user post' })
 })
 
-// POST a new post
-router.post('/', (req, res) => {
+// POST a new post (authorization required)
+router.post('/', requireAuth, (req, res) => {
   res.status(200).send({ message: 'Creating a new user post' })
 })
 
-// DELETE a post
-router.get('/', (req, res) => {
+// DELETE a post (authorization required)
+router.get('/', requireAuth, (req, res) => {
   res.status(200).send({ message: 'Delete a user post' })
 })
 
-// UPDATE a post
-router.get('/', (req, res) => {
+// UPDATE a post (authorization required)
+router.get('/', requireAuth, (req, res) => {
   res.status(200).send({ message: 'Update a user post' })
 })
 

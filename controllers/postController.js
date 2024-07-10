@@ -7,7 +7,7 @@ const User = require('../models/userModel')
 // Example: /api/posts/
 const getRecentPosts = async (req, res) => {
   // Fetching user ID from the request (Must be an ObjectId due to using Array.includes later on)
-  const { userId } = req.user_id
+  const userId = req.user._id
 
   try {
     // Fetching recent posts
@@ -49,7 +49,7 @@ const getRecentPosts = async (req, res) => {
 const getSinglePost = async (req, res) => {
   const { id } = req.params;
   // Fetching user ID from the request (Must be an ObjectId due to using Array.includes later on)
-  const { userId } = req.user_id
+  const userId = req.user._id
 
   try {
     // Checking if ID of a post is valid
@@ -93,6 +93,8 @@ const getSinglePost = async (req, res) => {
 // Example: /api/posts/
 const createPost = async (req, res) => {
   const { author_id, title, content } = req.body
+  const userId = req.user._id
+
   try {
     // Validating entry data
     if (!author_id || !title || !content) {
@@ -129,6 +131,7 @@ const createPost = async (req, res) => {
 // Example: /api/posts/507f191e810c19729de860ea
 const deletePost = async (req, res) => {
   const { id } = req.params;
+  const userId = req.user._id
 
   try {
     // Check if ID of a post is valid
@@ -162,7 +165,7 @@ const deletePost = async (req, res) => {
 const updatePost = async (req, res) => {
   const { id } = req.params
   const { action } = req.query
-  const { userId } = req.user_id
+  const userId = req.user._id
   const { content } = req.body
 
   try {

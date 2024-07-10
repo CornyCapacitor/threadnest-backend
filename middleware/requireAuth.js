@@ -11,14 +11,16 @@ const requireAuth = async (req, res, next) => {
     return res.status(401).send({ error: 'Authorization token required' })
   }
 
-  console.log(authorization)
+  console.log('Authorization:', authorization)
 
   // Extracting token from the headers
   const token = authorization.split(' ')[1]
 
+  console.log('Token:', token)
+
   try {
     // Verifying the token
-    const { _id } = jwt.verify(token, process.env.SECRET)
+    const { _id } = jwt.verify(token, process.env.JWT_SECRET)
 
     // Setting request value 'user' that contains the user id
     req.user = await User.findOne({ _id }).select('_id')
@@ -26,8 +28,15 @@ const requireAuth = async (req, res, next) => {
     // Moving on to another middleware/endpoint
     next()
   } catch (error) {
-    // Sending back the rror
-    console.log(error)
+    if (error.name === 'TokenExpiredError') {
+      console.log('Token expired:', error)
+      return res.status(401).send({ error: 'Token expired' })
+    }
+
+    // General authorization error
+    console.log('Wrong authorization key')
     res.status(401).send({ error: 'Request is not authorized' })
   }
 }
+
+module.exports = requireAuth
