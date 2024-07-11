@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-mongoose.set('StrictQuery', true)
+mongoose.set('strictQuery', true)
 
 const Schema = mongoose.Schema
 

@@ -1,31 +1,25 @@
 const express = require('express')
 const requireAuth = require('../middleware/requireAuth')
+const { getRecentPosts, getSinglePost, createPost, deletePost, updatePost } = require('../controllers/postController')
 
 const router = express.Router()
 
+// Requiring auth for each post endpoint since every endpoint needs user information
+router.use(requireAuth)
+
 // GET user posts
-router.get('/', (req, res) => {
-  res.status(200).send({ message: 'Getting all user posts' })
-})
+router.get('/', getRecentPosts)
 
 // GET a single post
-router.get('/:id', (req, res) => {
-  res.status(200).send({ message: 'Getting a user post' })
-})
+router.get('/:id', getSinglePost)
 
-// POST a new post (authorization required)
-router.post('/', requireAuth, (req, res) => {
-  res.status(200).send({ message: 'Creating a new user post' })
-})
+// POST a new post
+router.post('/', createPost)
 
-// DELETE a post (authorization required)
-router.get('/', requireAuth, (req, res) => {
-  res.status(200).send({ message: 'Delete a user post' })
-})
+// DELETE a post
+router.get('/', deletePost)
 
-// UPDATE a post (authorization required)
-router.get('/', requireAuth, (req, res) => {
-  res.status(200).send({ message: 'Update a user post' })
-})
+// UPDATE a post
+router.get('/', updatePost)
 
 module.exports = router

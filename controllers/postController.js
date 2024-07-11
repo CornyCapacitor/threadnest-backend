@@ -19,6 +19,10 @@ const getRecentPosts = async (req, res) => {
         select: '_id'
       })
 
+    if (!posts.length) {
+      return res.status(404).send({ error: 'No posts found' })
+    }
+
     const response = posts.map(post => {
       // Checking if userId exists in the upvotes array
       const isUpvoted = post.upvotes.includes(userId)
@@ -81,7 +85,7 @@ const getSinglePost = async (req, res) => {
     }
 
     // Sending back the response
-    res.status(200).send(post)
+    res.status(200).send(response)
   } catch (error) {
     // Sending back the error
     console.error('Error fetching post:', error)
@@ -92,25 +96,25 @@ const getSinglePost = async (req, res) => {
 // POST a new post
 // Example: /api/posts/
 const createPost = async (req, res) => {
-  const { author_id, title, content } = req.body
+  const { title, content } = req.body
   const userId = req.user._id
 
   try {
     // Validating entry data
-    if (!author_id || !title || !content) {
-      return res.status(400).send({ error: 'author_id, title and content are required' })
+    if (!title || !content) {
+      return res.status(400).send({ error: 'title and content are required' })
     }
 
-    const user = await User.findById(author_id)
+    const user = await User.findById(userId)
 
     // Checking if the user exists
     if (!user) {
-      return res.status(404).send({ error: `Failed to find user with ID: ${author_id}` })
+      return res.status(404).send({ error: `Failed to find user with ID: ${userId}` })
     }
 
     // Constructing new post information based on given data in request
     const post = new Post({
-      author_id,
+      author_id: userId,
       title,
       content
     })
@@ -137,6 +141,13 @@ const deletePost = async (req, res) => {
     // Check if ID of a post is valid
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).send({ message: 'Invalid post ID' })
+    }
+
+    const user = await User.findById(userId)
+
+    // Checking if the user exists
+    if (!user) {
+      return res.status(404).send({ error: `Failed to find user with ID: ${userId}` })
     }
 
     const post = await Post.findById(id)
@@ -244,4 +255,12 @@ const updatePost = async (req, res) => {
     // Sending back the error
     return res.status(500).send({ message: 'Failed to update post' })
   }
+}
+
+module.exports = {
+  getRecentPosts,
+  getSinglePost,
+  createPost,
+  deletePost,
+  updatePost,
 }
