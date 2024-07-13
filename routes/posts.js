@@ -4,7 +4,7 @@ const { getRecentPosts, getSinglePost, createPost, deletePost, updatePost } = re
 
 const router = express.Router()
 
-// Requiring auth for each post endpoint since every endpoint needs user information
+// Requiring auth for each post endpoint since every post endpoint needs user information
 router.use(requireAuth)
 
 // GET user posts
@@ -17,9 +17,9 @@ router.get('/:id', getSinglePost)
 router.post('/', createPost)
 
 // DELETE a post
-router.get('/', deletePost)
+router.delete('/', deletePost)
 
 // UPDATE a post
-router.get('/', updatePost)
+router.patch('/', updatePost)
 
 module.exports = router

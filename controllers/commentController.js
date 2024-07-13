@@ -93,6 +93,8 @@ const deleteComment = async (req, res) => {
 
   switch (action) {
     case 'single':
+      // { id } here behaves as comment id
+
       // Single comment delete
       try {
         // Check if ID of a comment is valid
@@ -128,6 +130,8 @@ const deleteComment = async (req, res) => {
       }
 
     case 'multiple':
+      // { id } here behaves as post id
+
       // All post related comments delete
       try {
         // Check if ID of a post is valid
@@ -152,4 +156,53 @@ const deleteComment = async (req, res) => {
     default:
       return res.status(400).send({ message: 'Invalid action' })
   }
+}
+
+// UPDATE a comment
+// Example: /api/comments/507f191e810c19729de860ea
+const updateComment = async (req, res) => {
+  const { id } = req.params
+  const { content } = req.body
+  const userId = req.user._id
+
+  try {
+    // Check if there's content inside given body
+    if (!username) {
+      return res.status(400).send({ message: 'Content is required for patch' })
+    }
+
+    // Checking if ID of a comment is valid
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send({ message: 'Invalid comment ID' })
+    }
+
+    // Checking if ID of a user is valid
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send({ message: 'Invalid user ID' })
+    }
+
+    const updatedComment = await Comment.findOneAndUpdate(
+      { author_id: userId, _id: id },
+      { $set: { content: content } },
+      { new: true }
+    )
+
+    // Checking if update was succesfull
+    if (!updatedComment) {
+      return res.status(404).send({ message: 'Comment not found' })
+    }
+
+    // Sending back the response
+    res.status(200).send({ message: `Updated comment: ${updatedComment}` })
+  } catch (error) {
+    // Sending back the error
+    res.status(400).json({ error: error.message })
+  }
+}
+
+module.exports = {
+  getComments,
+  createComment,
+  deleteComment,
+  updateComment
 }
