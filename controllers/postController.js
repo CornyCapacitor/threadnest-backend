@@ -169,17 +169,19 @@ const deletePost = async (req, res) => {
   }
 }
 
-// Nie podoba mi się w chuj ten update, muszę do tego usiąść jeszcze raz konkretniej
-
 // UPDATE a post
 // Example: /api/posts/507f191e810c19729de860ea
 const updatePost = async (req, res) => {
   const { id } = req.params
-  const { action } = req.query
   const userId = req.user._id
-  const { content } = req.body
+  const { content, title } = req.body
 
   try {
+    // Check if there's proper given request body
+    if (!content || !title) {
+      return res.status(400).send({ message: 'Title and content are required' })
+    }
+
     // Check if ID of a post is valid
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).send({ message: 'Invalid post ID' })
@@ -199,55 +201,12 @@ const updatePost = async (req, res) => {
       return res.status(404).send({ message: 'User not found' })
     }
 
-    switch (action) {
-      // Upvote action
-      case 'upvote':
-        if (!post.upvotes.includes(userId)) {
-          post.upvotes.push(userId);
-          post.upvotesCount = post.upvotes.length;
-        } else {
-          post.upvotes = post.upvotes.filter(uid => uid.toString() !== userId.toString());
-          post.upvotesCount = post.upvotes.length;
-        }
-        break
-
-      // Comment action
-      case 'comment':
-        if (!content) {
-          return res.status(400).send({ message: 'Content is required for comment' })
-        }
-        const newComment = new Comment({
-          author_id: user._id, // or userId from request
-          content: content,
-          post_id: post._id // or id from request
-        })
-
-        // Creating new comment document
-        await newComment.save()
-
-        // Updating the post's information
-        post.commentsCount = post.comments.length
-        break
-
-      // Edit action
-      case 'edit':
-        // Checking if the one who wants to edit is the post author
-        if (userId.toString() !== post.author_id.toString()) {
-          return res.status(403).send({ message: 'You are not authorized to edit this post' });
-        }
-
-        // Updating post information based on request body
-        if (title) post.title = title
-        if (content) post.content = content
-        break
-
-      // When no comment/edit/upvote actions included
-      default:
-        return res.status(400).send({ message: 'Invalid action' })
-    }
-
-    // Update the post
-    const updatedPost = await post.save()
+    // Updating the post in database
+    const updatedPost = await Post.findOneAndUpdate(
+      { _id: id },
+      { $set: { title: title, content: content } },
+      { new: true }
+    )
 
     // Sending back the response
     return res.status(200).send(updatedPost)

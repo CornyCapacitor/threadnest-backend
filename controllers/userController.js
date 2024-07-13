@@ -127,6 +127,11 @@ const updateUser = async (req, res) => {
   const userId = req.user._id
 
   try {
+    // Check if there's username inside given body
+    if (!username) {
+      return res.status(400).send({ message: 'Username is required for patch' })
+    }
+
     // Checking if ID of a user is valid
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).send({ message: 'Invalid user ID' })

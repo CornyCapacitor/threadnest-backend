@@ -21,6 +21,10 @@ const requireAuth = async (req, res, next) => {
     // Setting request value 'user' that contains the user id
     req.user = await User.findOne({ _id }).select('_id')
 
+    if (!req.user) {
+      return res.status(401).send({ error: 'User not found' })
+    }
+
     // Moving on to another middleware/endpoint
     next()
   } catch (error) {
