@@ -150,22 +150,19 @@ const deletePost = async (req, res) => {
       return res.status(404).send({ error: `Failed to find user with ID: ${userId}` })
     }
 
-    const post = await Post.findById(id)
+    const deletePost = await Post.findOneAndDelete({ _id: id })
 
     // Checking if post with given id exists
-    if (!post) {
-      return response.status(404).send({ error: 'Post not found' })
+    if (!deletePost) {
+      return res.status(404).send({ error: 'Post not found' })
     }
 
-    // Deleting the post from the database
-    await post.remove()
-
     // Sending back the response
-    response.send({ message: 'Post deleted succesfully' })
+    return res.send({ message: 'Post deleted succesfully' })
   } catch (error) {
     // Sending back the error
     console.error('Error fetching post:', error)
-    response.status(500).send({ error: 'Failed to delete post' })
+    return res.status(500).send({ error: 'Failed to delete post' })
   }
 }
 
