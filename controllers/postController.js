@@ -102,7 +102,7 @@ const createPost = async (req, res) => {
   try {
     // Validating entry data
     if (!title || !content) {
-      return res.status(400).send({ error: 'title and content are required' })
+      return res.status(400).send({ error: 'Title and content are required' })
     }
 
     // Constructing new post information based on given data in request
@@ -120,7 +120,7 @@ const createPost = async (req, res) => {
   } catch (error) {
     // Sending back the error
     console.error('Error during creating a new post:', error)
-    response.status(500).send({ error: 'Failed to create new post' })
+    res.status(500).send({ error: 'Failed to create new post' })
   }
 }
 
@@ -136,15 +136,35 @@ const deletePost = async (req, res) => {
       return res.status(400).send({ message: 'Invalid post ID' })
     }
 
-    const deletePost = await Post.findOneAndDelete({ _id: id })
+    const post = await Post.findOne({ author_id: userId, _id: id })
 
-    // Checking if post with given id exists
-    if (!deletePost) {
-      return res.status(404).send({ error: 'Post not found' })
+    // Checking if post with combination of this author_id and _id exists
+    if (!post) {
+      return res.status(404).send({ message: 'Post not found' });
+    }
+
+    // Deleting the post
+    await Post.findOneAndDelete({ author_id: userId, _id: id })
+
+    // Deleting post related comments
+    const deletePostComments = await Comment.deleteMany({ post_id: id })
+
+    // Removing unnecessary information from response
+    const responsePost = {
+      _id: post._id,
+      author_id: post.author_id,
+      title: post.title,
+    }
+
+    // Constructing response
+    const response = {
+      message: `Post ${post.title} with id ${post._id} and it's related comments have been deleted succesfully`,
+      post: responsePost,
+      commentsDeleted: deletePostComments.deletedCount
     }
 
     // Sending back the response
-    return res.send({ message: 'Post deleted succesfully' })
+    return res.send(response)
   } catch (error) {
     // Sending back the error
     console.error('Error fetching post:', error)
@@ -158,34 +178,68 @@ const updatePost = async (req, res) => {
   const { id } = req.params
   const userId = req.user._id
   const { content, title } = req.body
+  const { action } = req.query
 
   try {
-    // Check if there's proper given request body
-    if (!content || !title) {
-      return res.status(400).send({ message: 'Title and content are required' })
-    }
-
     // Check if ID of a post is valid
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).send({ message: 'Invalid post ID' })
     }
 
-    const post = await Post.findById(id)
+    let post
 
-    // Checking if post with given id exists
-    if (!post) {
-      return res.status(404).send({ message: 'Post not found' })
+    switch (action) {
+      case 'post':
+        // Check if there's proper given request body
+        if (!content || !title) {
+          return res.status(400).send({ message: 'Title and content are required' })
+        }
+
+        post = await Post.findOne({ author_id: userId, _id: id })
+
+        // Checking if post with combination of this author_id and _id exists
+        if (!post) {
+          return res.status(404).send({ message: 'Post not found' });
+        }
+
+        // Updating the post in database
+        const updatedPost = await Post.findOneAndUpdate(
+          { _id: id },
+          { $set: { title: title, content: content } },
+          { new: true }
+        )
+
+        // Sending back the response
+        return res.status(200).send(updatedPost)
+
+      case 'upvote':
+        // Check if post exists
+        post = await Post.findOne({ _id: id })
+
+        // Checking if post with given id exists
+        if (!post) {
+          return res.status(404).send({ message: 'Post not found' });
+        }
+
+        // Checking if user has already upvoted the post
+        const hasUpvoted = post.upvotes.includes(userId)
+
+        if (hasUpvoted) {
+          // Remove the user's upvote
+          post.upvotes = post.upvotes.filter(upvote => upvote.toString() !== userId.toString());
+        } else {
+          // Add the user's upvote
+          post.upvotes.push(userId);
+        }
+
+        await post.save()
+
+        // Sending back the response
+        return res.status(200).send(post)
+
+      default:
+        return res.status(400).send({ message: 'Invalid action' })
     }
-
-    // Updating the post in database
-    const updatedPost = await Post.findOneAndUpdate(
-      { _id: id },
-      { $set: { title: title, content: content } },
-      { new: true }
-    )
-
-    // Sending back the response
-    return res.status(200).send(updatedPost)
   } catch (error) {
     // Sending back the error
     return res.status(500).send({ message: 'Failed to update post' })

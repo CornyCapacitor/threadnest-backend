@@ -79,19 +79,29 @@ const deleteUser = async (req, res) => {
       return res.status(404).send({ error: 'User not found' })
     }
 
+    // Deleting user related posts
     const deleteUserPosts = await Post.deleteMany({ author_id: id })
 
+    // Deleting user related comments
     const deleteUserComments = await Comment.deleteMany({ author_id: id })
 
-    const deleteValue = {
+    // Removing unnecessary information from response
+    const responseUser = {
+      _id: deleteUser._id,
+      email: deleteUser.email,
+      username: deleteUser.username,
+    }
+
+    // Constructing response
+    const response = {
       message: `User ${deleteUser.username} with id ${deleteUser._id} and his related posts/comments have been deleted succesfully`,
-      user: deleteUser,
+      user: responseUser,
       postsDeleted: deleteUserPosts.deletedCount,
       commentsDeleted: deleteUserComments.deletedCount
     }
 
     // Sending back the response
-    res.status(200).send(deleteValue)
+    res.status(200).send(response)
   } catch (error) {
     // Sending back the error
     res.status(400).json({ error: error.message })
@@ -111,7 +121,7 @@ const signupUser = async (req, res) => {
     const token = createToken(user._id)
 
     // Sending back the response
-    res.status(200).json({ email, token })
+    res.status(200).json({ email, token, username: user.username })
   } catch (err) {
     // Sending back the error
     res.status(400).json({ error: err.message })
@@ -131,7 +141,7 @@ const loginUser = async (req, res) => {
     const token = createToken(user._id)
 
     // Sending back the response
-    res.status(200).send({ email, token })
+    res.status(200).send({ email, token, username: user.username })
   } catch (error) {
     // Sending back the error
     res.status(400).json({ error: error.message })

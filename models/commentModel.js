@@ -10,6 +10,7 @@ const commentSchema = new Schema({
   },
   content: {
     type: String,
+    maxLength: [500, 'Comment cannot exceed 500 characters'],
     required: [true, 'Content is required']
   },
   upvotes: [
