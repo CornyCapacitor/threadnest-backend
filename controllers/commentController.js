@@ -6,6 +6,7 @@ const Comment = require('../models/commentModel')
 // Example: /api/comments/507f191e810c19729de860ea
 const getComments = async (req, res) => {
   const { id } = req.params // post ID
+  const userId = req.user._id
 
   try {
     // Checking if ID of a post is valid
@@ -22,11 +23,32 @@ const getComments = async (req, res) => {
 
     // Fetching comments related to the post
     const comments = await Comment.find({ post_id: post._id })
-      .populate('author_id', 'username')
-      .select('content author_id createdAt upvotesCount')
+      .populate({
+        path: 'author_id',
+        select: '_id'
+      })
+
+    if (!comments.length) {
+      res.status(404).send({ message: 'No comments found' })
+    }
+
+    const response = comments.map(comment => {
+      // Checking if userId exists in the upvotes array
+      const isUpvoted = comment.upvotes.includes(userId)
+
+      // Constructing correct object response for the frontend
+      return {
+        _id: comment._id,
+        author_id: comment.author_id,
+        post_id: comment.post_id,
+        content: comment.content,
+        upvotesCount: comment.upvotes.length,
+        upvoted: isUpvoted
+      }
+    })
 
     // Sending back the comments
-    res.status(200).send(comments)
+    res.status(200).send(response)
   } catch (error) {
     // Sending back the error
     console.error('Error fetching comments:', error)
@@ -39,7 +61,7 @@ const getComments = async (req, res) => {
 const createComment = async (req, res) => {
   const { id } = req.params // post ID
   const { content } = req.body
-  const { userId } = req.user_id
+  const userId = req.user._id
 
   try {
     // Checking if ID of a post is valid
@@ -54,33 +76,21 @@ const createComment = async (req, res) => {
       return res.status(404).send({ message: 'Post not found' })
     }
 
-    const user = await User.findById(userId)
-
-    // Check if there's a user with given ID
-    if (!user) {
-      return res.status(404).send({ message: 'User not found' })
-    }
-
     // Constructing new comment
-    const newComment = new Comment({
-      author_id: user._id,
-      content: content,
+    const comment = new Comment({
+      author_id: userId,
+      content,
       post_id: post._id
     })
 
-    // Saving new comment document
-    await newComment.save()
-
-    // Updating post's information
-    post.commentsCount = post.comments.length
-
-    // Saving changes made to the post
-    await post.save()
+    // Creating new comment insite the database
+    await comment.save()
 
     // Sending back the response
-    return res.status(200).send(newComment)
+    return res.status(200).send(comment)
   } catch (error) {
     // Sending back the error
+    console.error(error)
     return res.status(500).send({ message: 'Failed to create a comment' })
   }
 }

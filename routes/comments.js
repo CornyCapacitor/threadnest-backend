@@ -8,7 +8,7 @@ const router = express.Router()
 router.use(requireAuth)
 
 // GET single post's comments
-router.get('/', getComments)
+router.get('/:id', getComments)
 
 // POST a new comment
 router.post('/:id', createComment)
