@@ -105,13 +105,6 @@ const createPost = async (req, res) => {
       return res.status(400).send({ error: 'title and content are required' })
     }
 
-    const user = await User.findById(userId)
-
-    // Checking if the user exists
-    if (!user) {
-      return res.status(404).send({ error: `Failed to find user with ID: ${userId}` })
-    }
-
     // Constructing new post information based on given data in request
     const post = new Post({
       author_id: userId,
@@ -141,13 +134,6 @@ const deletePost = async (req, res) => {
     // Check if ID of a post is valid
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).send({ message: 'Invalid post ID' })
-    }
-
-    const user = await User.findById(userId)
-
-    // Checking if the user exists
-    if (!user) {
-      return res.status(404).send({ error: `Failed to find user with ID: ${userId}` })
     }
 
     const deletePost = await Post.findOneAndDelete({ _id: id })
@@ -189,13 +175,6 @@ const updatePost = async (req, res) => {
     // Checking if post with given id exists
     if (!post) {
       return res.status(404).send({ message: 'Post not found' })
-    }
-
-    const user = await User.findById(userId)
-
-    // Check if there's a user with given ID
-    if (!user) {
-      return res.status(404).send({ message: 'User not found' })
     }
 
     // Updating the post in database
