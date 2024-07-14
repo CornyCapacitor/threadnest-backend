@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 const User = require('../models/userModel')
+const Post = require('../models/postModel')
+const Comment = require('../models/commentModel')
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
 
@@ -77,8 +79,19 @@ const deleteUser = async (req, res) => {
       return res.status(404).send({ error: 'User not found' })
     }
 
+    const deleteUserPosts = await Post.deleteMany({ author_id: id })
+
+    const deleteUserComments = await Comment.deleteMany({ author_id: id })
+
+    const deleteValue = {
+      message: `User ${deleteUser.username} with id ${deleteUser._id} and his related posts/comments have been deleted succesfully`,
+      user: deleteUser,
+      postsDeleted: deleteUserPosts.deletedCount,
+      commentsDeleted: deleteUserComments.deletedCount
+    }
+
     // Sending back the response
-    res.status(200).send(deleteUser)
+    res.status(200).send(deleteValue)
   } catch (error) {
     // Sending back the error
     res.status(400).json({ error: error.message })
