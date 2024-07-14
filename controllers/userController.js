@@ -57,11 +57,17 @@ const getUser = async (req, res) => {
 // Example: /api/users/delete/668d9b89f9494d0b032ad7b3
 const deleteUser = async (req, res) => {
   const { id } = req.params
+  const userId = req.user._id
 
   try {
     // Checking if ID of a user is valid
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).send({ message: 'Invalid user ID' })
+    }
+
+    // Checking if authorized user and params user are equal (!= is intentional)
+    if (id != userId) {
+      return res.status(404).send({ message: 'Logged user does not match user in params' })
     }
 
     const deleteUser = await User.findOneAndDelete({ _id: id })
