@@ -86,6 +86,10 @@ const createComment = async (req, res) => {
     // Creating new comment insite the database
     await comment.save()
 
+    // Updating the post with the new comment
+    post.comments.push(comment._id)
+    await post.save()
+
     // Sending back the response
     return res.status(200).send(comment)
   } catch (error) {
