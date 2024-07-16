@@ -13,7 +13,7 @@ router.get('/:id', getComments)
 // POST a new comment
 router.post('/:id', createComment)
 
-// DELETE a comment/all post related comments
+// DELETE a comment
 router.delete('/:id', deleteComment)
 
 // UPDATE a comment

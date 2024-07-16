@@ -29,7 +29,7 @@ const getComments = async (req, res) => {
       })
 
     if (!comments.length) {
-      res.status(404).send({ message: 'No comments found' })
+      return res.status(404).send({ message: 'No comments found' })
     }
 
     const response = comments.map(comment => {
@@ -99,10 +99,11 @@ const createComment = async (req, res) => {
   }
 }
 
-// DELETE a comment/post related comments
+// DELETE a comment
 // Example: /api/comments/507f191e810c19729de860ea
 const deleteComment = async (req, res) => {
-  const { id } = req.params // comment/post ID
+  const { id } = req.params
+  const userId = req.user._id
 
   try {
     // Check if ID of a comment is valid
@@ -117,6 +118,11 @@ const deleteComment = async (req, res) => {
       return res.status(404).send({ error: 'Comment not found' })
     }
 
+    // Checking if user is equal to comment's author
+    if (comment.author_id.toString() !== userId.toString()) {
+      return res.status(401).send({ error: 'User id and author_id are not equal' })
+    }
+
     const postId = comment.post_id
 
     const post = await Post.findById(postId)
@@ -127,13 +133,17 @@ const deleteComment = async (req, res) => {
     }
 
     // Delete the comment
-    await comment.remove()
+    await Comment.findOneAndDelete({ author_id: userId, _id: id })
+
+    // Delete comment from post comments
+    post.comments.pull(id)
+    await post.save()
 
     // Sending back the response
     return res.status(200).send({ message: 'Comment deleted succesfully' })
   } catch (error) {
     // Sending back the error
-    console.error('Error fetching post:', error)
+    console.error('Error fetching comments:', error)
     return res.status(500).send({ error: 'Failed to delete comment' })
   }
 }

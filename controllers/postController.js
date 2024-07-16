@@ -226,7 +226,7 @@ const updatePost = async (req, res) => {
 
         if (hasUpvoted) {
           // Remove the user's upvote
-          post.upvotes = post.upvotes.filter(upvote => upvote.toString() !== userId.toString());
+          post.upvotes.pull(userId)
         } else {
           // Add the user's upvote
           post.upvotes.push(userId);
