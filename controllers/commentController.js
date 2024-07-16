@@ -103,72 +103,38 @@ const createComment = async (req, res) => {
 // Example: /api/comments/507f191e810c19729de860ea
 const deleteComment = async (req, res) => {
   const { id } = req.params // comment/post ID
-  const { action } = req.query // delete type
 
-  switch (action) {
-    case 'single':
-      // { id } here behaves as comment id
+  try {
+    // Check if ID of a comment is valid
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send({ message: 'Invalid comment ID' })
+    }
 
-      // Single comment delete
-      try {
-        // Check if ID of a comment is valid
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-          return res.status(400).send({ message: 'Invalid comment ID' })
-        }
+    const comment = await Comment.findById(id)
 
-        const comment = await Comment.findById(id)
+    // Checking if comment with given id exists
+    if (!comment) {
+      return res.status(404).send({ error: 'Comment not found' })
+    }
 
-        // Checking if comment with given id exists
-        if (!comment) {
-          return res.status(404).send({ error: 'Comment not found' })
-        }
+    const postId = comment.post_id
 
-        const postId = comment.post_id
+    const post = await Post.findById(postId)
 
-        const post = await Post.findById(postId)
+    // Checking if post with given id exists
+    if (!post) {
+      return res.status(404).send({ error: 'Post not found' })
+    }
 
-        // Checking if post with given id exists
-        if (!post) {
-          return res.status(404).send({ error: 'Post not found' })
-        }
+    // Delete the comment
+    await comment.remove()
 
-        // Delete the comment
-        await comment.remove()
-
-        // Sending back the response
-        return res.status(200).send({ message: 'Comment deleted succesfully' })
-      } catch (error) {
-        // Sending back the error
-        console.error('Error fetching post:', error)
-        return res.status(500).send({ error: 'Failed to delete comment' })
-      }
-
-    case 'multiple':
-      // { id } here behaves as post id
-
-      // All post related comments delete
-      try {
-        // Check if ID of a post is valid
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-          return res.status(400).send({ message: 'Invalid post ID' })
-        }
-
-        // Finding and deleting all comments related to the post
-        const result = await Comment.deleteMany({ post_id: id })
-
-        if (result.deletedCount === 0) {
-          return res.status(404).send({ message: 'No comments found for this post' })
-        }
-
-        // Send back the response
-        return res.status(200).send({ message: `Succesfully deleted ${result.deletedCount} comments` })
-      } catch (error) {
-        // Sending back the error
-        return res.status(500).send({ message: 'Failed to delete comments' })
-      }
-
-    default:
-      return res.status(400).send({ message: 'Invalid action' })
+    // Sending back the response
+    return res.status(200).send({ message: 'Comment deleted succesfully' })
+  } catch (error) {
+    // Sending back the error
+    console.error('Error fetching post:', error)
+    return res.status(500).send({ error: 'Failed to delete comment' })
   }
 }
 
