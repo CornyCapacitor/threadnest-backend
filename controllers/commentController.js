@@ -153,6 +153,7 @@ const deleteComment = async (req, res) => {
 const updateComment = async (req, res) => {
   const { id } = req.params
   const { content } = req.body
+  const { action } = req.query
   const userId = req.user._id
 
   try {
@@ -161,12 +162,10 @@ const updateComment = async (req, res) => {
       return res.status(400).send({ error: 'Invalid comment ID' })
     }
 
-    let comment
-
     switch (action) {
-      case 'comment':
+      case 'update':
         // Check if there's content inside given body
-        if (!username) {
+        if (!content) {
           return res.status(400).send({ error: 'Content is required for patch' })
         }
 
@@ -182,7 +181,8 @@ const updateComment = async (req, res) => {
         }
 
         // Sending back the response
-        res.status(200).send({ message: `Updated comment: ${updatedComment}` })
+        return res.status(200).send({ message: `Updated comment: ${updatedComment}` })
+
       case 'upvote':
         const comment = await Comment.findOne({ _id: id })
 
@@ -212,7 +212,7 @@ const updateComment = async (req, res) => {
     }
   } catch (error) {
     // Sending back the error
-    res.status(400).send({ error: error.message })
+    return res.status(400).send({ error: error.message })
   }
 }
 

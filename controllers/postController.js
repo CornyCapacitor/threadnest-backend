@@ -189,7 +189,7 @@ const updatePost = async (req, res) => {
     }
 
     switch (action) {
-      case 'post':
+      case 'update':
         // Check if there's proper given request body
         if (!content || !title) {
           return res.status(400).send({ error: 'Title and content are required' })

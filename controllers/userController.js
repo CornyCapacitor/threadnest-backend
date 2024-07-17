@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const User = require('../models/userModel')
 const Post = require('../models/postModel')
 const Comment = require('../models/commentModel')
-const jwt = require('sendwebtoken')
+const jwt = require('jsonwebtoken')
 require('dotenv').config()
 
 // Token creation
