@@ -6,7 +6,7 @@ require('dotenv')
 const requireAuth = async (req, res, next) => {
   const { authorization } = req.headers
 
-  // Checking if there's auth information inside headers
+  // Check if there's auth information inside headers
   if (!authorization) {
     return res.status(401).send({ error: 'Authorization token required' })
   }

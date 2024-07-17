@@ -9,16 +9,16 @@ const getComments = async (req, res) => {
   const userId = req.user._id
 
   try {
-    // Checking if ID of a post is valid
+    // Check if ID of a post is valid
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).send({ message: 'Invalid post ID' })
+      return res.status(400).send({ error: 'Invalid post ID' })
     }
 
     const post = await Post.findById(id)
 
-    // Checking if the post exists
+    // Check if the post exists
     if (!post) {
-      return res.status(404).send({ message: 'Post not found' })
+      return res.status(404).send({ error: 'Post not found' })
     }
 
     // Fetching comments related to the post
@@ -29,14 +29,14 @@ const getComments = async (req, res) => {
       })
 
     if (!comments.length) {
-      return res.status(404).send({ message: 'No comments found' })
+      return res.status(404).send({ error: 'No comments found' })
     }
 
+    // Constructing response
     const response = comments.map(comment => {
-      // Checking if userId exists in the upvotes array
+      // Check if userId exists in the upvotes array
       const isUpvoted = comment.upvotes.includes(userId)
 
-      // Constructing correct object response for the frontend
       return {
         _id: comment._id,
         author_id: comment.author_id,
@@ -51,7 +51,7 @@ const getComments = async (req, res) => {
     res.status(200).send(response)
   } catch (error) {
     // Sending back the error
-    console.error('Error fetching comments:', error)
+    console.error(error)
     res.status(500).send({ error: 'Failed to fetch comments' })
   }
 }
@@ -64,16 +64,16 @@ const createComment = async (req, res) => {
   const userId = req.user._id
 
   try {
-    // Checking if ID of a post is valid
+    // Check if ID of a post is valid
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).send({ message: 'Invalid post ID' })
+      return res.status(400).send({ error: 'Invalid post ID' })
     }
 
     const post = await Post.findById(id)
 
-    // Checking if the post exists
+    // Check if the post exists
     if (!post) {
-      return res.status(404).send({ message: 'Post not found' })
+      return res.status(404).send({ error: 'Post not found' })
     }
 
     // Constructing new comment
@@ -108,17 +108,17 @@ const deleteComment = async (req, res) => {
   try {
     // Check if ID of a comment is valid
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).send({ message: 'Invalid comment ID' })
+      return res.status(400).send({ error: 'Invalid comment ID' })
     }
 
     const comment = await Comment.findById(id)
 
-    // Checking if comment with given id exists
+    // Check if comment with given id exists
     if (!comment) {
       return res.status(404).send({ error: 'Comment not found' })
     }
 
-    // Checking if user is equal to comment's author
+    // Check if user is equal to comment's author
     if (comment.author_id.toString() !== userId.toString()) {
       return res.status(401).send({ error: 'User id and author_id are not equal' })
     }
@@ -127,7 +127,7 @@ const deleteComment = async (req, res) => {
 
     const post = await Post.findById(postId)
 
-    // Checking if post with given id exists
+    // Check if post with given id exists
     if (!post) {
       return res.status(404).send({ error: 'Post not found' })
     }
@@ -143,7 +143,7 @@ const deleteComment = async (req, res) => {
     return res.status(200).send({ message: 'Comment deleted succesfully' })
   } catch (error) {
     // Sending back the error
-    console.error('Error fetching comments:', error)
+    console.error(error)
     return res.status(500).send({ error: 'Failed to delete comment' })
   }
 }
@@ -156,37 +156,63 @@ const updateComment = async (req, res) => {
   const userId = req.user._id
 
   try {
-    // Check if there's content inside given body
-    if (!username) {
-      return res.status(400).send({ message: 'Content is required for patch' })
-    }
-
-    // Checking if ID of a comment is valid
+    // Check if ID of a comment is valid
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).send({ message: 'Invalid comment ID' })
+      return res.status(400).send({ error: 'Invalid comment ID' })
     }
 
-    // Checking if ID of a user is valid
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).send({ message: 'Invalid user ID' })
+    let comment
+
+    switch (action) {
+      case 'comment':
+        // Check if there's content inside given body
+        if (!username) {
+          return res.status(400).send({ error: 'Content is required for patch' })
+        }
+
+        const updatedComment = await Comment.findOneAndUpdate(
+          { author_id: userId, _id: id },
+          { $set: { content: content } },
+          { new: true }
+        )
+
+        // Check if update was succesfull
+        if (!updatedComment) {
+          return res.status(404).send({ error: 'Comment not found' })
+        }
+
+        // Sending back the response
+        res.status(200).send({ message: `Updated comment: ${updatedComment}` })
+      case 'upvote':
+        const comment = await Comment.findOne({ _id: id })
+
+        // Check if comment exists
+        if (!comment) {
+          return res.status(404).send({ error: 'Comment not found' })
+        }
+
+        // Check if user has already upvoted the comment
+        const hasUpvoted = comment.upvotes.includes(userId)
+
+        if (hasUpvoted) {
+          // Remove the user's upvote
+          comment.upvotes.pull(userId)
+        } else {
+          // Add the user's upvote
+          comment.upvotes.push(userId)
+        }
+
+        await comment.save()
+
+        // Sending back the response
+        return res.status(200).send(comment)
+
+      default:
+        return res.status(400).send({ error: 'Invalid action' })
     }
-
-    const updatedComment = await Comment.findOneAndUpdate(
-      { author_id: userId, _id: id },
-      { $set: { content: content } },
-      { new: true }
-    )
-
-    // Checking if update was succesfull
-    if (!updatedComment) {
-      return res.status(404).send({ message: 'Comment not found' })
-    }
-
-    // Sending back the response
-    res.status(200).send({ message: `Updated comment: ${updatedComment}` })
   } catch (error) {
     // Sending back the error
-    res.status(400).json({ error: error.message })
+    res.status(400).send({ error: error.message })
   }
 }
 

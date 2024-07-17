@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const User = require('../models/userModel')
 const Post = require('../models/postModel')
 const Comment = require('../models/commentModel')
-const jwt = require('jsonwebtoken')
+const jwt = require('sendwebtoken')
 require('dotenv').config()
 
 // Token creation
@@ -35,14 +35,14 @@ const getUser = async (req, res) => {
   const { id } = req.params
 
   try {
-    // Checking if ID of a user is valid
+    // Check if ID of a user is valid
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).send({ message: 'Invalid user ID' })
+      return res.status(400).send({ error: 'Invalid user ID' })
     }
 
     const user = await User.findOne({ _id: id })
 
-    // Not sure if I should do this check due to try/catch block being here already
+    // Check if user was found
     if (!user) {
       res.status(404).send({ error: 'No user found' })
     }
@@ -62,19 +62,19 @@ const deleteUser = async (req, res) => {
   const userId = req.user._id
 
   try {
-    // Checking if ID of a user is valid
+    // Check if ID of a user is valid
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).send({ message: 'Invalid user ID' })
+      return res.status(400).send({ error: 'Invalid user ID' })
     }
 
-    // Checking if authorized user and params user are equal (!= is intentional)
+    // Check if authorized user and params user are equal (!= is intentional)
     if (id != userId) {
-      return res.status(404).send({ message: 'Logged user does not match user in params' })
+      return res.status(404).send({ error: 'Logged user does not match user in params' })
     }
 
-    const deleteUser = await User.findOneAndDelete({ _id: id })
+    const deleteUser = await User.findOneAndDelete({ _id: userId })
 
-    // Checking if user exists
+    // Check if user exists
     if (!deleteUser) {
       return res.status(404).send({ error: 'User not found' })
     }
@@ -104,7 +104,50 @@ const deleteUser = async (req, res) => {
     res.status(200).send(response)
   } catch (error) {
     // Sending back the error
-    res.status(400).json({ error: error.message })
+    res.status(400).send({ error: error.message })
+  }
+}
+
+// PATCH existing user
+// Example: /api/users/668d9b89f9494d0b032ad7b3
+const updateUser = async (req, res) => {
+  const { id } = req.params
+  const { username } = req.body
+  const userId = req.user._id
+
+  try {
+    // Check if there's username inside given body
+    if (!username) {
+      return res.status(400).send({ error: 'Username is required for patch' })
+    }
+
+    // Check if ID of a user is valid
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send({ error: 'Invalid user ID' })
+    }
+
+    // Check if authorized user and params user are equal (!= is intentional)
+    if (id != userId) {
+      return res.status(404).send({ error: 'Logged user does not match user in params' })
+    }
+
+    // Updating the user in database
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId },
+      { $set: { username: username } },
+      { new: true }
+    )
+
+    // Check if update was succesfull
+    if (!updatedUser) {
+      return res.status(404).send({ error: 'User not found' })
+    }
+
+    // Sending back the response
+    res.status(200).send({ message: `Updated user: ${updatedUser}` })
+  } catch (error) {
+    // Sending back the error
+    res.status(400).send({ error: error.message })
   }
 }
 
@@ -121,10 +164,10 @@ const signupUser = async (req, res) => {
     const token = createToken(user._id)
 
     // Sending back the response
-    res.status(200).json({ email, token, username: user.username })
+    res.status(200).send({ email, token, username: user.username })
   } catch (err) {
     // Sending back the error
-    res.status(400).json({ error: err.message })
+    res.status(400).send({ error: err.message })
   }
 }
 
@@ -144,50 +187,7 @@ const loginUser = async (req, res) => {
     res.status(200).send({ email, token, username: user.username })
   } catch (error) {
     // Sending back the error
-    res.status(400).json({ error: error.message })
-  }
-}
-
-// PATCH existing user
-// Example: /api/users/668d9b89f9494d0b032ad7b3
-const updateUser = async (req, res) => {
-  const { id } = req.params
-  const { username } = req.body
-  const userId = req.user._id
-
-  try {
-    // Check if there's username inside given body
-    if (!username) {
-      return res.status(400).send({ message: 'Username is required for patch' })
-    }
-
-    // Checking if ID of a user is valid
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).send({ message: 'Invalid user ID' })
-    }
-
-    // Checking if authorized user and params user are equal (!= is intentional)
-    if (id != userId) {
-      return res.status(404).send({ message: 'Logged user does not match user in params' })
-    }
-
-    // Updating the user in database
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: userId },
-      { $set: { username: username } },
-      { new: true }
-    )
-
-    // Checking if update was succesfull
-    if (!updatedUser) {
-      return res.status(404).send({ message: 'User not found' })
-    }
-
-    // Sending back the response
-    res.status(200).send({ message: `Updated user: ${updatedUser}` })
-  } catch (error) {
-    // Sending back the error
-    res.status(400).json({ error: error.message })
+    res.status(400).send({ error: error.message })
   }
 }
 

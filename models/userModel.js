@@ -43,7 +43,7 @@ userSchema.statics.signup = async function (email, password, username) {
     throw Error('Password not strong enough')
   }
 
-  // Checking for duplicate
+  // Check for duplicate
   const duplicate = await this.findOne({ email })
 
   if (duplicate) {
@@ -68,14 +68,14 @@ userSchema.statics.login = async function (email, password) {
     throw Error('All fields are required')
   }
 
-  // Checking if user exists
+  // Check if user exists
   const user = await this.findOne({ email })
 
   if (!user) {
     throw Error('Incorrect email')
   }
 
-  // Checking password integrity
+  // Check password integrity
   const match = await bcrypt.compare(password, user.password)
 
   if (!match) {
