@@ -48,11 +48,10 @@ const getComments = async (req, res) => {
     })
 
     // Sending back the comments
-    res.status(200).send(response)
+    return res.status(200).send(response)
   } catch (error) {
     // Sending back the error
-    console.error(error)
-    res.status(500).send({ error: 'Failed to fetch comments' })
+    return res.status(500).send({ error: 'Failed to fetch comments' })
   }
 }
 
@@ -94,7 +93,6 @@ const createComment = async (req, res) => {
     return res.status(200).send(comment)
   } catch (error) {
     // Sending back the error
-    console.error(error)
     return res.status(500).send({ message: 'Failed to create a comment' })
   }
 }

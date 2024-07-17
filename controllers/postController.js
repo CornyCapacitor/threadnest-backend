@@ -39,11 +39,11 @@ const getRecentPosts = async (req, res) => {
     })
 
     // Sending back the response
-    res.status(200).send(response)
+    return res.status(200).send(response)
   } catch (error) {
     // Sending back the error
     console.error(error)
-    res.status(500).send({ error: 'Failed to fetch recent posts' })
+    return res.status(500).send({ error: 'Failed to fetch recent posts' })
   }
 }
 
@@ -83,11 +83,11 @@ const getSinglePost = async (req, res) => {
     }
 
     // Sending back the response
-    res.status(200).send(response)
+    return res.status(200).send(response)
   } catch (error) {
     // Sending back the error
     console.error(error)
-    res.status(500).send({ message: 'An error occured while fetching the post' })
+    return res.status(500).send({ message: 'An error occured while fetching the post' })
   }
 }
 
@@ -114,11 +114,11 @@ const createPost = async (req, res) => {
     await post.save()
 
     // Sending back the response
-    res.status(201).send(post)
+    return res.status(201).send(post)
   } catch (error) {
     // Sending back the error
     console.error(error)
-    res.status(500).send({ error: 'Failed to create new post' })
+    return res.status(500).send({ error: 'Failed to create new post' })
   }
 }
 

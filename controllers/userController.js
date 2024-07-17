@@ -18,14 +18,14 @@ const getUsers = async (req, res) => {
 
     // Not sure if I should do this check due to try/catch block being here already
     if (!users.length) {
-      res.status(404).send({ error: 'No users found' })
+      return res.status(404).send({ error: 'No users found' })
     }
 
     // Sending back the response
-    res.status(200).send(users)
+    return res.status(200).send(users)
   } catch (error) {
     // Sending back the error
-    res.status(400).send({ error: error.message })
+    return res.status(400).send({ error: error.message })
   }
 }
 
@@ -44,14 +44,14 @@ const getUser = async (req, res) => {
 
     // Check if user was found
     if (!user) {
-      res.status(404).send({ error: 'No user found' })
+      return res.status(404).send({ error: 'No user found' })
     }
 
     // Sending back the response
-    res.status(200).send(user)
+    return res.status(200).send(user)
   } catch (error) {
     // Sending back the error
-    res.status(400).send({ error: error.message })
+    return res.status(400).send({ error: error.message })
   }
 }
 
@@ -101,10 +101,10 @@ const deleteUser = async (req, res) => {
     }
 
     // Sending back the response
-    res.status(200).send(response)
+    return res.status(200).send(response)
   } catch (error) {
     // Sending back the error
-    res.status(400).send({ error: error.message })
+    return res.status(400).send({ error: error.message })
   }
 }
 
@@ -144,10 +144,10 @@ const updateUser = async (req, res) => {
     }
 
     // Sending back the response
-    res.status(200).send({ message: `Updated user: ${updatedUser}` })
+    return res.status(200).send({ message: `Updated user: ${updatedUser}` })
   } catch (error) {
     // Sending back the error
-    res.status(400).send({ error: error.message })
+    return res.status(400).send({ error: error.message })
   }
 }
 
@@ -164,10 +164,10 @@ const signupUser = async (req, res) => {
     const token = createToken(user._id)
 
     // Sending back the response
-    res.status(200).send({ email, token, username: user.username })
+    return res.status(200).send({ email, token, username: user.username })
   } catch (err) {
     // Sending back the error
-    res.status(400).send({ error: err.message })
+    return res.status(400).send({ error: err.message })
   }
 }
 
@@ -184,10 +184,10 @@ const loginUser = async (req, res) => {
     const token = createToken(user._id)
 
     // Sending back the response
-    res.status(200).send({ email, token, username: user.username })
+    return res.status(200).send({ email, token, username: user.username })
   } catch (error) {
     // Sending back the error
-    res.status(400).send({ error: error.message })
+    return res.status(400).send({ error: error.message })
   }
 }
 
