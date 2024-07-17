@@ -1,7 +1,0 @@
------
-Test user
------
-
-"username": "John",
-"email": "john.doe@threadnest.com,
-"password": "Test123!"
