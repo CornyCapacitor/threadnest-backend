@@ -134,13 +134,6 @@ const deletePost = async (req, res) => {
       return res.status(400).send({ error: 'Invalid post ID' })
     }
 
-    const post = await Post.findOne({ author_id: userId, _id: id })
-
-    // Check if post with combination of this author_id and _id exists
-    if (!post) {
-      return res.status(404).send({ error: 'Post not found' });
-    }
-
     const deletePost = await Post.findOneAndDelete({ author_id: userId, _id: id })
 
     // Check if post exists

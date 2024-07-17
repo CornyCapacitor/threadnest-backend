@@ -25,7 +25,7 @@ const getUsers = async (req, res) => {
     return res.status(200).send(users)
   } catch (error) {
     // Sending back the error
-    return res.status(400).send({ error: error.message })
+    return res.status(500).send({ error: error.message })
   }
 }
 
@@ -51,7 +51,7 @@ const getUser = async (req, res) => {
     return res.status(200).send(user)
   } catch (error) {
     // Sending back the error
-    return res.status(400).send({ error: error.message })
+    return res.status(500).send({ error: error.message })
   }
 }
 
@@ -69,7 +69,7 @@ const deleteUser = async (req, res) => {
 
     // Check if authorized user and params user are equal (!= is intentional)
     if (id != userId) {
-      return res.status(404).send({ error: 'Logged user does not match user in params' })
+      return res.status(401).send({ error: 'Logged user does not match user in params' })
     }
 
     const deleteUser = await User.findOneAndDelete({ _id: userId })
@@ -104,7 +104,7 @@ const deleteUser = async (req, res) => {
     return res.status(200).send(response)
   } catch (error) {
     // Sending back the error
-    return res.status(400).send({ error: error.message })
+    return res.status(500).send({ error: error.message })
   }
 }
 
@@ -128,7 +128,7 @@ const updateUser = async (req, res) => {
 
     // Check if authorized user and params user are equal (!= is intentional)
     if (id != userId) {
-      return res.status(404).send({ error: 'Logged user does not match user in params' })
+      return res.status(400).send({ error: 'Logged user does not match user in params' })
     }
 
     // Updating the user in database
@@ -147,7 +147,7 @@ const updateUser = async (req, res) => {
     return res.status(200).send({ message: `Updated user: ${updatedUser}` })
   } catch (error) {
     // Sending back the error
-    return res.status(400).send({ error: error.message })
+    return res.status(500).send({ error: error.message })
   }
 }
 
@@ -164,10 +164,10 @@ const signupUser = async (req, res) => {
     const token = createToken(user._id)
 
     // Sending back the response
-    return res.status(200).send({ email, token, username: user.username })
+    return res.status(201).send({ email, token, username: user.username })
   } catch (err) {
     // Sending back the error
-    return res.status(400).send({ error: err.message })
+    return res.status(500).send({ error: err.message })
   }
 }
 
@@ -187,7 +187,7 @@ const loginUser = async (req, res) => {
     return res.status(200).send({ email, token, username: user.username })
   } catch (error) {
     // Sending back the error
-    return res.status(400).send({ error: error.message })
+    return res.status(500).send({ error: error.message })
   }
 }
 

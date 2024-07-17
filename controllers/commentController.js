@@ -116,8 +116,8 @@ const deleteComment = async (req, res) => {
       return res.status(404).send({ error: 'Comment not found' })
     }
 
-    // Check if user is equal to comment's author
-    if (comment.author_id.toString() !== userId.toString()) {
+    // Check if comment author and authorized user are equal (!= is intentional)
+    if (comment.author_id != userId) {
       return res.status(401).send({ error: 'User id and author_id are not equal' })
     }
 
