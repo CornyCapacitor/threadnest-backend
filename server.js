@@ -1,6 +1,7 @@
 require('dotenv').config()
 const mongoose = require('mongoose')
 const express = require('express')
+const path = require('path')
 const postRoutes = require('./routes/posts')
 const userRoutes = require('./routes/users')
 const commentRoutes = require('./routes/comments')
@@ -11,11 +12,10 @@ const PORT = process.env.PORT
 
 // Middlewares
 app.use(express.json())
+app.use('/', express.static(path.join(__dirname, 'public')))
 
 // Routes
-app.get('/', (request, response) => {
-  response.send({ message: 'Welcome to ThreadNest backend!' })
-})
+app.use('/', require('./routes/root'))
 app.use('/api/posts', postRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/comments', commentRoutes)
