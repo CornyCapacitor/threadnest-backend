@@ -188,8 +188,6 @@ const updatePost = async (req, res) => {
       return res.status(400).send({ error: 'Invalid post ID' })
     }
 
-    let post
-
     switch (action) {
       case 'post':
         // Check if there's proper given request body
@@ -212,10 +210,9 @@ const updatePost = async (req, res) => {
         return res.status(200).send(updatedPost)
 
       case 'upvote':
-        // Check if post exists
-        post = await Post.findOne({ _id: id })
+        const post = await Post.findOne({ _id: id })
 
-        // Check if post with given id exists
+        // Check if post exists
         if (!post) {
           return res.status(404).send({ error: 'Post not found' });
         }
