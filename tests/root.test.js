@@ -1,0 +1,19 @@
+const request = require('supertest');
+const { expect } = require('chai');
+const app = require('../server');
+const cheerio = require('cheerio')
+
+describe('GET /', () => {
+  it('should return the root page', async () => {
+    const res = await request(app)
+      .get('/')
+      .expect(200)
+
+    expect(res.headers['content-type']).to.include('text/html')
+
+    const $ = cheerio.load(res.text)
+    const header = $('h1').text()
+
+    expect(header).to.equal('ThreadNest')
+  })
+})
