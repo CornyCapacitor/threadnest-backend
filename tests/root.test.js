@@ -4,7 +4,7 @@ const app = require('../server');
 const cheerio = require('cheerio')
 
 describe('GET /', () => {
-  it('should return the root page', async () => {
+  it('should succesfully connect to the database and respond correctly', async () => {
     const res = await request(app)
       .get('/')
       .expect(200)
