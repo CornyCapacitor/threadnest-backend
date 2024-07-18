@@ -1,3 +1,4 @@
+const mongoose = require('mongoose')
 const request = require('supertest');
 const { expect } = require('chai');
 const app = require('../server');
@@ -15,5 +16,10 @@ describe('GET /', () => {
     const header = $('h1').text()
 
     expect(header).to.equal('ThreadNest')
+
+    // Close the connection after the test is done
+    after(async () => {
+      await mongoose.connection.close()
+    })
   })
 })

@@ -44,7 +44,7 @@ const getUser = async (req, res) => {
 
     // Check if user was found
     if (!user) {
-      return res.status(404).send({ error: 'No user found' })
+      return res.status(404).send({ error: 'User not found' })
     }
 
     // Sending back the response
