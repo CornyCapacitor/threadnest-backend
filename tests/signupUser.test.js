@@ -36,12 +36,13 @@ describe('POST /api/users/signup', () => {
     const user = await User.findOne({ email: res.body.email, username: res.body.username })
     userId = user._id
 
-    const isMatch = await bcrypt.compare(userData.password, user.password)
-
     expect(user).to.not.be.null
     expect(user.username).to.equal(userData.username)
     expect(user.email).to.equal(userData.email)
-    expect(isMatch).to.be.true;
+
+    const isMatch = await bcrypt.compare(userData.password, user.password)
+
+    expect(isMatch).to.be.true
   })
 
   it('should return 500 for missing body', async () => {
