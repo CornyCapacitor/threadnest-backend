@@ -65,4 +65,66 @@ describe('POST /api/users/login', () => {
 
     expect(isMatch).to.be.true
   })
+
+  it('should return 500 if no empty body', async () => {
+    const res = await request(app)
+      .post('/api/users/login')
+      .expect(500)
+
+    expect(res.body).to.have.property('error', 'All fields are required')
+  })
+
+  it('should return 500 for no email attached', async () => {
+    const userData = {
+      password: 'Password123!'
+    }
+
+    const res = await request(app)
+      .post('/api/users/login')
+      .send(userData)
+      .expect(500)
+
+    expect(res.body).to.have.property('error', 'All fields are required')
+  })
+
+  it('should return 500 for no password attached', async () => {
+    const userData = {
+      email: 'testlogin@example.com'
+    }
+
+    const res = await request(app)
+      .post('/api/users/login')
+      .send(userData)
+      .expect(500)
+
+    expect(res.body).to.have.property('error', 'All fields are required')
+  })
+
+  it('should return 500 when cannot find user with given email', async () => {
+    const userData = {
+      email: 'nofounduser@example.com',
+      password: 'Password123!'
+    }
+
+    const res = await request(app)
+      .post('/api/users/login')
+      .send(userData)
+      .expect(500)
+
+    expect(res.body).to.have.property('error', 'Incorrect email')
+  })
+
+  it('should return 500 when wrong password is given', async () => {
+    const userData = {
+      email: 'testlogin@example.com',
+      password: 'Incorrectpassword123!',
+    }
+
+    const res = await request(app)
+      .post('/api/users/login')
+      .send(userData)
+      .expect(500)
+
+    expect(res.body).to.have.property('error', 'Incorrect password')
+  })
 })
