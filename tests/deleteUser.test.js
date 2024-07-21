@@ -18,7 +18,7 @@ describe('DELETE /api/users/:id', () => {
   let token
 
   beforeEach(async () => {
-    await User.deleteMany({ username: 'Login User' })
+    await User.deleteMany({ username: 'Delete User' })
 
     const userData = {
       email: 'deleteuser@example.com',

@@ -128,7 +128,7 @@ const updateUser = async (req, res) => {
 
     // Check if authorized user and params user are equal (!= is intentional)
     if (id != userId) {
-      return res.status(400).send({ error: 'Logged user does not match user in params' })
+      return res.status(401).send({ error: 'Logged user does not match user in params' })
     }
 
     // Updating the user in database
@@ -144,7 +144,7 @@ const updateUser = async (req, res) => {
     }
 
     // Sending back the response
-    return res.status(200).send({ message: `Updated user: ${updatedUser}` })
+    return res.status(200).send(updatedUser)
   } catch (error) {
     // Sending back the error
     return res.status(500).send({ error: error.message })
