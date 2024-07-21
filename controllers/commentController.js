@@ -90,7 +90,7 @@ const createComment = async (req, res) => {
     await post.save()
 
     // Sending back the response
-    return res.status(200).send(comment)
+    return res.status(201).send(comment)
   } catch (error) {
     // Sending back the error
     return res.status(500).send({ message: 'Failed to create a comment' })
