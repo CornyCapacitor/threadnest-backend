@@ -49,8 +49,6 @@ describe('PATCH /api/users/:id', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(200)
 
-    console.log(res.body)
-
     expect(res.body).to.have.property('_id', userId.toString())
     expect(res.body).to.have.property('username', userData.username)
 
