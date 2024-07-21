@@ -42,7 +42,7 @@ describe('requireAuth middleware', () => {
     await User.deleteMany({ username: 'Authorized User' })
   })
 
-  it('should set req.user and call next() if token is valid', async () => {
+  it('should pass the authorization and get posts if token is valid', async () => {
     await request(app)
       .get('/api/posts')
       .set('Authorization', `Bearer ${token}`)
