@@ -4,15 +4,19 @@ const Comment = require('../models/commentModel')
 const User = require('../models/userModel')
 
 // GET recent posts
-// Example: /api/posts/
+// Example: /api/posts?load=3
 const getRecentPosts = async (req, res) => {
   const userId = req.user._id
+  const load = req.query.load || 1
+  const limit = 20
+  const skipBy = (load - 1) * limit
 
   try {
     // Fetching recent posts
     const posts = await Post.find()
       .sort({ createdAt: -1 })
-      .limit(20)
+      .skip(skipBy)
+      .limit(limit)
       .populate({
         path: 'author_id',
         select: '_id'

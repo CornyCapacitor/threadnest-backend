@@ -71,29 +71,48 @@ describe('GET /api/posts', () => {
     expect(post.title).to.be.equal('Test post')
   })
 
-  it('should get 20 latest posts', async () => {
+  it('should return latest posts', async () => {
+    const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
     const postPromises = []
-    for (let i = 0; i < 20; i++) {
+
+    for (let i = 0; i < 40; i++) {
       const post = new Post({
         author_id: userId,
-        title: `Test post ${i + 1}`,
+        title: `Test post ${Math.random()}`,
         content: 'Example content to use it inside all the tests. It is at least 50 characters long so nothing breaks due to model requirements.'
       })
       postPromises.push(post.save())
+      await delay(10)
     }
 
-    await Promise.all(postPromises)
+    await Promise.allSettled(postPromises)
 
-    const res = await request(app)
+    // Fetch the first 20 posts (load=1 by default)
+    const firstRes = await request(app)
       .get('/api/posts')
       .set('Authorization', `Bearer ${token}`)
       .expect(200)
 
-    expect(res.body).to.be.an('array')
-    expect(res.body).to.have.lengthOf(20)
+    expect(firstRes.body).to.be.an('array')
+    expect(firstRes.body.length).to.equal(20)
 
-    res.body.forEach(post => {
-      expect(post.author_id).to.be.equal(userId.toString())
+    // Fetch the next 20 posts (load=2)
+    const secondRes = await request(app)
+      .get('/api/posts?load=2')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+
+    expect(secondRes.body).to.be.an('array')
+    expect(secondRes.body.length).to.equal(20)
+
+    const responses = firstRes.body.concat(secondRes.body)
+
+    const uniquePosts = new Set(responses.map(post => post._id));
+    expect(uniquePosts.size).to.equal(responses.length);
+
+    responses.forEach(post => {
+      expect(post.author_id).to.equal(userId.toString())
+      expect(post.upvoted).to.be.false
     })
   })
 })
