@@ -141,7 +141,6 @@ const deleteComment = async (req, res) => {
     return res.status(200).send({ message: 'Comment deleted succesfully' })
   } catch (error) {
     // Sending back the error
-    console.error(error)
     return res.status(500).send({ error: 'Failed to delete comment' })
   }
 }
