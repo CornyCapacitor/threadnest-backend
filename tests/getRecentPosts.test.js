@@ -71,7 +71,9 @@ describe('GET /api/posts', () => {
     expect(post.title).to.be.equal('Test post')
   })
 
-  it('should return latest posts', async () => {
+  it('should return latest posts', async function () {
+    this.timeout(10000)
+
     const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
     const postPromises = []
 
@@ -114,5 +116,14 @@ describe('GET /api/posts', () => {
       expect(post.author_id).to.equal(userId.toString())
       expect(post.upvoted).to.be.false
     })
+  })
+
+  it('should not return any post skipping millions of posts', async () => {
+    const res = await request(app)
+      .get('/api/posts?load=1000000')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(404)
+
+    expect(res.body).to.have.property('error', 'No posts found')
   })
 })
