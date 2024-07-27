@@ -154,13 +154,13 @@ const deletePost = async (req, res) => {
 
     // Constructing response
     const response = {
-      message: `Post ${post.title} with id ${post._id} and it's related comments have been deleted succesfully`,
+      message: `Post ${deletePost.title} with id ${deletePost._id} and it's related comments have been deleted succesfully`,
       post: responsePost,
       commentsDeleted: deletePostComments.deletedCount
     }
 
     // Sending back the response
-    return res.send(response)
+    return res.status(200).send(response)
   } catch (error) {
     // Sending back the error
     return res.status(500).send({ error: 'Failed to delete post' })
