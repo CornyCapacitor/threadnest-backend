@@ -168,7 +168,7 @@ const deletePost = async (req, res) => {
 }
 
 // UPDATE a post
-// Example: /api/posts/507f191e810c19729de860ea
+// Example: /api/posts/507f191e810c19729de860ea?action=update
 const updatePost = async (req, res) => {
   const { id } = req.params
   const userId = req.user._id
@@ -192,7 +192,7 @@ const updatePost = async (req, res) => {
         const updatedPost = await Post.findOneAndUpdate(
           { author_id: userId, _id: id },
           { $set: { title: title, content: content } },
-          { new: true }
+          { new: true, runValidators: true }
         )
 
         if (!updatedPost) {
@@ -231,7 +231,7 @@ const updatePost = async (req, res) => {
     }
   } catch (error) {
     // Sending back the error
-    return res.status(500).send({ message: 'Failed to update post' })
+    return res.status(500).send({ message: error.message })
   }
 }
 
