@@ -135,7 +135,7 @@ const updateUser = async (req, res) => {
     const updatedUser = await User.findOneAndUpdate(
       { _id: userId },
       { $set: { username: username } },
-      { new: true }
+      { new: true, runValidators: true }
     )
 
     // Check if update was succesfull

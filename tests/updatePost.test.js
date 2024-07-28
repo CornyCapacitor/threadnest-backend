@@ -230,7 +230,7 @@ describe('PATCH /api/posts/:id', function () {
       .send(postData1)
       .expect(500)
 
-    expect(res1.body).to.have.property('message', 'Validation failed: content: Post content must be at least 50 characters long')
+    expect(res1.body).to.have.property('error', 'Validation failed: content: Post content must be at least 50 characters long')
 
     const postData2 = {
       title: 'Too long content',
@@ -243,7 +243,7 @@ describe('PATCH /api/posts/:id', function () {
       .send(postData2)
       .expect(500)
 
-    expect(res2.body).to.have.property('message', 'Validation failed: content: Post content cannot exceed 2500 characters')
+    expect(res2.body).to.have.property('error', 'Validation failed: content: Post content cannot exceed 2500 characters')
   })
 
   it('should return 400 for invalid action chosen', async () => {

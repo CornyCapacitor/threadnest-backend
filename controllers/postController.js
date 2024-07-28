@@ -231,7 +231,7 @@ const updatePost = async (req, res) => {
     }
   } catch (error) {
     // Sending back the error
-    return res.status(500).send({ message: error.message })
+    return res.status(500).send({ error: error.message })
   }
 }
 

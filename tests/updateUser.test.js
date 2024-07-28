@@ -96,4 +96,30 @@ describe('PATCH /api/users/:id', () => {
 
     expect(res.body).to.have.property('error', 'Logged user does not match user in params')
   })
+
+  it('should return 500 for wrong username', async () => {
+    const userData1 = {
+      username: 'A'
+    }
+
+    const res1 = await request(app)
+      .patch(`/api/users/${userId}`)
+      .send(userData1)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(500)
+
+    expect(res1.body).to.have.property('error', 'Validation failed: username: Username must be at least 3 characters long')
+
+    const userData2 = {
+      username: 'A pretty long username that should not be available to patch'
+    }
+
+    const res2 = await request(app)
+      .patch(`/api/users/${userId}`)
+      .send(userData2)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(500)
+
+    expect(res2.body).to.have.property('error', 'Validation failed: username: Username cannot exceed 30 characters')
+  })
 })
