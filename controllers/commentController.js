@@ -68,6 +68,11 @@ const createComment = async (req, res) => {
       return res.status(400).send({ error: 'Invalid post ID' })
     }
 
+    // Check if content is applied
+    if (!content) {
+      return res.status(400).send({ error: 'Content is required' })
+    }
+
     const post = await Post.findById(id)
 
     // Check if the post exists
@@ -93,7 +98,7 @@ const createComment = async (req, res) => {
     return res.status(201).send(comment)
   } catch (error) {
     // Sending back the error
-    return res.status(500).send({ message: 'Failed to create a comment' })
+    return res.status(500).send({ error: error.message })
   }
 }
 
