@@ -174,7 +174,7 @@ const updateComment = async (req, res) => {
         const updatedComment = await Comment.findOneAndUpdate(
           { author_id: userId, _id: id },
           { $set: { content: content } },
-          { new: true }
+          { new: true, runValidators: true }
         )
 
         // Check if update was succesfull
@@ -183,7 +183,7 @@ const updateComment = async (req, res) => {
         }
 
         // Sending back the response
-        return res.status(200).send({ message: `Updated comment: ${updatedComment}` })
+        return res.status(200).send(updatedComment)
 
       case 'upvote':
         const comment = await Comment.findOne({ _id: id })
@@ -214,7 +214,7 @@ const updateComment = async (req, res) => {
     }
   } catch (error) {
     // Sending back the error
-    return res.status(400).send({ error: error.message })
+    return res.status(500).send({ error: error.message })
   }
 }
 
