@@ -86,8 +86,6 @@ describe('POST /api/comments/:id', () => {
       .send(comment)
       .expect(201)
 
-    console.log(res.body)
-
     expect(res.body).to.deep.include({
       author_id: userId.toString(),
       post_id: testPostId.toString(),

@@ -200,7 +200,7 @@ describe('PATCH /api/posts/:id', function () {
       .send(postData1)
       .expect(500)
 
-    expect(res1.body).to.have.property('message', 'Validation failed: title: Post title must be at least 3 characters long')
+    expect(res1.body).to.have.property('error', 'Validation failed: title: Post title must be at least 3 characters long')
 
     const postData2 = {
       title: `${generateRandomString(251)}`,
@@ -213,7 +213,7 @@ describe('PATCH /api/posts/:id', function () {
       .send(postData2)
       .expect(500)
 
-    expect(res2.body).to.have.property('message', 'Validation failed: title: Post title cannot exceed 250 characters')
+    expect(res2.body).to.have.property('error', 'Validation failed: title: Post title cannot exceed 250 characters')
   })
 
   it('should return 500 for wrong updated post content', async () => {
