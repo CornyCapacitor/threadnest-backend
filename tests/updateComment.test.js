@@ -6,8 +6,6 @@ const Post = require('../models/postModel')
 const Comment = require('../models/commentModel')
 const { v4: uuidv4 } = require('uuid')
 const mongoose = require('mongoose')
-const jwt = require('jsonwebtoken')
-require('dotenv')
 
 function generateRandomString(length) {
   const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'

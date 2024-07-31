@@ -6,7 +6,6 @@ const Post = require('../models/postModel')
 const Comment = require('../models/commentModel')
 const { v4: uuidv4 } = require('uuid')
 const mongoose = require('mongoose')
-require('dotenv')
 
 describe('DELETE /api/users/:id', () => {
   let userId

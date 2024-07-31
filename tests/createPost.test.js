@@ -3,10 +3,6 @@ const { expect } = require('chai');
 const app = require('../server');
 const User = require('../models/userModel');
 const Post = require('../models/postModel')
-const Comment = require('../models/commentModel')
-const { v4: uuidv4 } = require('uuid')
-const mongoose = require('mongoose')
-require('dotenv')
 
 function generateRandomString(length) {
   const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'

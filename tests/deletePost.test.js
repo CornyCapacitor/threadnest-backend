@@ -3,15 +3,8 @@ const { expect } = require('chai');
 const app = require('../server');
 const User = require('../models/userModel');
 const Post = require('../models/postModel')
-const Comment = require('../models/commentModel')
 const { v4: uuidv4 } = require('uuid')
 const mongoose = require('mongoose')
-const jwt = require('jsonwebtoken')
-require('dotenv')
-
-const createToken = (_id) => {
-  return jwt.sign({ _id }, process.env.JWT_SECRET, { expiresIn: '1h' })
-}
 
 describe('DELETE /api/posts/:id', () => {
   let token
