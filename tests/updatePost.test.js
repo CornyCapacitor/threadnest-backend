@@ -5,17 +5,7 @@ const User = require('../models/userModel');
 const Post = require('../models/postModel')
 const { v4: uuidv4 } = require('uuid')
 const mongoose = require('mongoose')
-
-function generateRandomString(length) {
-  const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-  let result = ''
-
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length))
-  }
-
-  return result
-}
+const generateRandomString = require('../utils/generateRandomString')
 
 describe('PATCH /api/posts/:id', function () {
   this.timeout(10000)
