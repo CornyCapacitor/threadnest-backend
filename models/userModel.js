@@ -30,7 +30,6 @@ const userSchema = new Schema({
 
 // Static signup method
 userSchema.statics.signup = async function (email, password, username) {
-  // Validation
   if (!email || !password || !username) {
     throw Error('All fields are required')
   }
@@ -43,19 +42,16 @@ userSchema.statics.signup = async function (email, password, username) {
     throw Error('Password not strong enough')
   }
 
-  // Check for duplicate
   const duplicate = await this.findOne({ email })
 
   if (duplicate) {
     throw Error('Email already in use')
   }
 
-  // Constructing hash password
   const saltRounds = 10
   const salt = await bcrypt.genSalt(saltRounds)
   const hashedPassword = await bcrypt.hash(password, salt)
 
-  // Creating new user in database
   const user = await this.create({ email, password: hashedPassword, username })
 
   return user
@@ -63,19 +59,16 @@ userSchema.statics.signup = async function (email, password, username) {
 
 // Static login method
 userSchema.statics.login = async function (email, password) {
-  // Validation
   if (!email || !password) {
     throw Error('All fields are required')
   }
 
-  // Check if user exists
   const user = await this.findOne({ email })
 
   if (!user) {
     throw Error('Incorrect email')
   }
 
-  // Check password integrity
   const match = await bcrypt.compare(password, user.password)
 
   if (!match) {

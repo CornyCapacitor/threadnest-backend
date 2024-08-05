@@ -2,6 +2,7 @@ require('dotenv').config()
 const mongoose = require('mongoose')
 const express = require('express')
 const path = require('path')
+const cors = require('cors')
 const postRoutes = require('./routes/posts')
 const userRoutes = require('./routes/users')
 const commentRoutes = require('./routes/comments')
@@ -9,6 +10,13 @@ const commentRoutes = require('./routes/comments')
 // App setup
 const app = express()
 const PORT = process.env.PORT
+
+// CORS options
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}))
 
 // Middlewares
 app.use(express.json())
