@@ -42,7 +42,7 @@ userSchema.statics.signup = async function (email, password, username) {
     throw Error('Password not strong enough')
   }
 
-  const duplicate = await this.findOne({ email })
+  const duplicate = await this.findOne({ email: email.toLowerCase() })
 
   if (duplicate) {
     throw Error('Email already in use')
@@ -52,7 +52,7 @@ userSchema.statics.signup = async function (email, password, username) {
   const salt = await bcrypt.genSalt(saltRounds)
   const hashedPassword = await bcrypt.hash(password, salt)
 
-  const user = await this.create({ email, password: hashedPassword, username })
+  const user = await this.create({ email: email.tolowerCase(), password: hashedPassword, username })
 
   return user
 }
@@ -63,7 +63,7 @@ userSchema.statics.login = async function (email, password) {
     throw Error('All fields are required')
   }
 
-  const user = await this.findOne({ email })
+  const user = await this.findOne({ email: email.toLowerCase })
 
   if (!user) {
     throw Error('Incorrect email')
