@@ -14,16 +14,14 @@ const createToken = (_id) => {
 // Example: /api/users
 const getUsers = async (req, res) => {
   try {
-    const users = await User.find()
+    const users = await User.find().select('_id username email')
 
     if (!users.length) {
       return res.status(404).send({ error: 'No users found' })
     }
 
-    // Sending back the response
     return res.status(200).send(users)
   } catch (error) {
-    // Sending back the error
     return res.status(500).send({ error: error.message })
   }
 }
