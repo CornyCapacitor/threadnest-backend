@@ -6,6 +6,7 @@ const Schema = mongoose.Schema
 const commentSchema = new Schema({
   author_id: {
     type: String,
+    ref: 'User',
     required: [true, 'Author ID is required']
   },
   content: {

@@ -18,7 +18,7 @@ const getRecentPosts = async (req, res) => {
       .limit(limit)
       .populate({
         path: 'author_id',
-        select: '_id'
+        select: '_id username'
       })
 
     if (!posts.length) {
@@ -31,6 +31,7 @@ const getRecentPosts = async (req, res) => {
       return {
         _id: post._id,
         author_id: post.author_id,
+        author_username: post.author_id.username,
         title: post.title,
         content: post.content,
         upvotesCount: post.upvotes.length,
