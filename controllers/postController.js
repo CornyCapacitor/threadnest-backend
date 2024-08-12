@@ -192,7 +192,13 @@ const updatePost = async (req, res) => {
 
         await post.save()
 
-        return res.status(200).send(post)
+        const response = {
+          _id: post._id,
+          upvotesCount: post.upvotes.length,
+          upvoted: !hasUpvoted,
+        }
+
+        return res.status(200).send(response)
 
       default:
         return res.status(400).send({ error: 'Invalid action' })
