@@ -36,6 +36,7 @@ const getRecentPosts = async (req, res) => {
         content: post.content,
         upvotesCount: post.upvotes.length,
         commentsCount: post.comments.length,
+        createdAt: post.createdAt,
         upvoted: isUpvoted
       }
     })
@@ -73,6 +74,7 @@ const getSinglePost = async (req, res) => {
       content: post.content,
       upvotesCount: post.upvotes.length,
       commentsCount: post.comments.length,
+      createdAt: post.createdAt,
       upvoted: isUpvoted
     }
 
