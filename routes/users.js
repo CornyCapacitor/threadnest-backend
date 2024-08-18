@@ -11,7 +11,7 @@ router.get('/', getUsers)
 router.get('/:id', getUser)
 
 // Delete user route (authorization required)
-router.delete('/:id', requireAuth, deleteUser)
+router.delete('/', requireAuth, deleteUser)
 
 // Login route
 router.post('/login', loginUser)
