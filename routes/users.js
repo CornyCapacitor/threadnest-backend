@@ -20,6 +20,6 @@ router.post('/login', loginUser)
 router.post('/signup', signupUser)
 
 // Update user route (authorization required)
-router.patch('/:id', requireAuth, updateUser)
+router.patch('/', requireAuth, updateUser)
 
 module.exports = router

@@ -3,6 +3,8 @@ const User = require('../models/userModel')
 const Post = require('../models/postModel')
 const Comment = require('../models/commentModel')
 const jwt = require('jsonwebtoken')
+const validator = require('validator')
+const bcrypt = require('bcrypt')
 require('dotenv').config()
 
 // Token creation
@@ -93,36 +95,82 @@ const deleteUser = async (req, res) => {
 }
 
 // PATCH existing user
-// Example: /api/users/668d9b89f9494d0b032ad7b3
+// Example: /api/users?action=username
 const updateUser = async (req, res) => {
-  const { id } = req.params
   const { username } = req.body
+  const { password } = req.body
   const userId = req.user._id
+  const action = req.query.action
 
   try {
-    if (!username) {
-      return res.status(400).send({ error: 'Username is required for patch' })
+    switch (action) {
+      case 'username':
+        if (!username) {
+          return res.status(400).send({ error: 'Username is required for patch' })
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+          return res.status(400).send({ error: 'Invalid user ID' })
+        }
+
+        if (!userId) {
+          return res.status(401).send({ error: 'Failed to set user after an authentication' })
+        }
+
+        const duplicate = await User.findOne({ username: username })
+
+        if (duplicate) {
+          return res.status(400).send({ error: 'Username already exists' })
+        }
+
+        const updatedUsername = await User.findOneAndUpdate(
+          { _id: userId },
+          { $set: { username: username } },
+          { new: true, runValidators: true }
+        )
+
+        if (!updatedUsername) {
+          return res.status(404).send({ error: 'User not found' })
+        }
+
+        return res.status(200).send(updatedUsername)
+
+      case 'password':
+        if (!password) {
+          return res.status(400).send({ error: 'Password is required for patch ' })
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+          return res.status(400).send({ error: 'Invalid user ID' })
+        }
+
+        if (!userId) {
+          return res.status(401).send({ error: 'Failed to set user after an authentication' })
+        }
+
+        if (!validator.isStrongPassword(password)) {
+          return res.status(400).send({ error: 'Password not strong enough' })
+        }
+
+        const saltRounds = 10
+        const salt = await bcrypt.genSalt(saltRounds)
+        const hashedPassword = await bcrypt.hash(password, salt)
+
+        const updatedPassword = await User.findOneAndUpdate(
+          { _id: userId },
+          { $set: { password: hashedPassword } },
+          { new: true, runValidators: true }
+        )
+
+        if (!updatedPassword) {
+          return res.status(404).send({ error: 'User not found' })
+        }
+
+        return res.status(200).send(updatedPassword)
+      default:
+        return res.status(400).send({ error: 'Invalid action' })
     }
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).send({ error: 'Invalid user ID' })
-    }
-
-    if (id != userId) {
-      return res.status(401).send({ error: 'Logged user does not match user in params' })
-    }
-
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: userId },
-      { $set: { username: username } },
-      { new: true, runValidators: true }
-    )
-
-    if (!updatedUser) {
-      return res.status(404).send({ error: 'User not found' })
-    }
-
-    return res.status(200).send(updatedUser)
   } catch (error) {
     return res.status(500).send({ error: error.message })
   }
