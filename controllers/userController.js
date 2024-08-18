@@ -56,7 +56,7 @@ const deleteUser = async (req, res) => {
   const userId = req.user._id
 
   try {
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).send({ error: 'Invalid user ID' })
     }
 
