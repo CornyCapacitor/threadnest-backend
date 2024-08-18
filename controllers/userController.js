@@ -51,18 +51,13 @@ const getUser = async (req, res) => {
 }
 
 // DELETE user
-// Example: /api/users/delete/668d9b89f9494d0b032ad7b3
+// Example: /api/users/delete
 const deleteUser = async (req, res) => {
-  const { id } = req.params
   const userId = req.user._id
 
   try {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).send({ error: 'Invalid user ID' })
-    }
-
-    if (id != userId) {
-      return res.status(401).send({ error: 'Logged user does not match user in params' })
     }
 
     const deleteUser = await User.findOneAndDelete({ _id: userId })
@@ -71,9 +66,9 @@ const deleteUser = async (req, res) => {
       return res.status(404).send({ error: 'User not found' })
     }
 
-    const deleteUserPosts = await Post.deleteMany({ author_id: id })
+    const deleteUserPosts = await Post.deleteMany({ author_id: userId })
 
-    const deleteUserComments = await Comment.deleteMany({ author_id: id })
+    const deleteUserComments = await Comment.deleteMany({ author_id: userId })
 
     const responseUser = {
       _id: deleteUser._id,
