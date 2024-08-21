@@ -38,6 +38,7 @@ const getComments = async (req, res) => {
         post_id: comment.post_id,
         content: comment.content,
         upvotesCount: comment.upvotes.length,
+        createdAt: comment.createdAt,
         upvoted: isUpvoted
       }
     })
