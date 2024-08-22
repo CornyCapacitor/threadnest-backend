@@ -176,7 +176,13 @@ const updateComment = async (req, res) => {
 
         await comment.save()
 
-        return res.status(200).send(comment)
+        const response = {
+          _id: comment._id,
+          upvotesCount: comment.upvotes.length,
+          upvoted: !hasUpvoted
+        }
+
+        return res.status(200).send(response)
 
       default:
         return res.status(400).send({ error: 'Invalid action' })
