@@ -22,7 +22,7 @@ const getComments = async (req, res) => {
     const comments = await Comment.find({ post_id: post._id })
       .populate({
         path: 'author_id',
-        select: '_id'
+        select: '_id username'
       })
 
     if (!comments.length) {
@@ -34,7 +34,8 @@ const getComments = async (req, res) => {
 
       return {
         _id: comment._id,
-        author_id: comment.author_id,
+        author_id: comment.author_id._id,
+        author_username: comment.author_id.username,
         post_id: comment.post_id,
         content: comment.content,
         upvotesCount: comment.upvotes.length,

@@ -30,7 +30,7 @@ const getRecentPosts = async (req, res) => {
 
       return {
         _id: post._id,
-        author_id: post.author_id,
+        author_id: post.author_id._id,
         author_username: post.author_id.username,
         title: post.title,
         content: post.content,
@@ -59,7 +59,10 @@ const getSinglePost = async (req, res) => {
     }
 
     const post = await Post.findById(id)
-      .populate('author_id', 'username')
+      .populate({
+        path: 'author_id',
+        select: '_id username'
+      })
 
     if (!post) {
       return res.status(404).send({ error: 'Post not found' })
@@ -69,7 +72,8 @@ const getSinglePost = async (req, res) => {
 
     const response = {
       _id: post._id,
-      author_id: post.author_id,
+      author_id: post.author_id._id,
+      author_username: post.author_id.username,
       title: post.title,
       content: post.content,
       upvotesCount: post.upvotes.length,
