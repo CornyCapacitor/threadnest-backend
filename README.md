@@ -1,4 +1,4 @@
-# Quest & Loot 🧵
+# ThreadNest 🧵
 
 ### Visit it yourself 
 [External link to ThreadNest website](https://threadnest.vercel.app/)
